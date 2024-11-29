@@ -1,0 +1,67 @@
+f=2;
+fs=20*f;
+t=0:1/fs:1;
+a=2;
+x=a*sin(2*pi*f*t);
+x1=x+a;
+q_op=round(x1);
+enco=de2bi(q_op,'left-msb');
+deco=bi2de(enco,'left-msb');
+xr=deco-a;
+plot(t,x,'r-',t,xr,'g+-');
+xlabel('Time');
+ylabel('Amplitude');
+legend('Original Signal','Reconstructed Signal');
+DPCM
+
+                                                                        %DPCM
+clc;        %SHASHWAT THAKUR 20230802325
+clear all ;
+close all ;
+fm=4;
+fs=20*fm;
+am=2;
+t=0:1/fs:1;
+x=am*cos(2*pi*fm*t);
+figure(1);
+plot(t,x,'r-');
+hold on;
+xlabel('Time');
+ylabel('Amplitude');
+
+%DPCM TRANSMITTER
+
+for n=1:length(x)
+    if n==1
+        e(n)=x(n);
+        eq(n)=round(e(n));
+        xq(n)=eq(n);
+    else
+        e(n)=x(n)-xq(n-1);
+        eq(n)=round(e(n));
+        xq(n)=eq(n)+xq(n-1);
+    end
+end
+%DPCM RECIEVER
+for n=1:length(x)
+    if n==1
+        xqr(n)=eq(n);
+    else
+        xqr(n)=eq(n)+xqr(n-1);
+    end
+end
+figure(1);
+plot(t,xqr,'k-');
+xlabel('Time');
+ylabel('Amplitude');
+legend('Original Signal','Reconstructed Signal');
+
+% LOW PASS FILTERING
+
+[num,den]=butter(2,4*fm/fs);
+roc_op=filter(num,den,xqr);
+figure(2);
+plot(t,roc_op,'k-');
+xlabel('Time');
+ylabel('Amplitude');
+title('Smoothed Signal');
